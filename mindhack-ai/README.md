@@ -1,0 +1,90 @@
+# MindVerse AI
+
+**Lock in. Play smart. Know your patterns.** A local-first, educational brain-game experience for exploring game-session performance without diagnostic claims.
+
+> **Implementation status:** This repository contains a runnable visual app, working browser-based game loops for all five games, local session recap and JSON/CSV export, a camera preview with opt-in permission, and a FastAPI validation API. It is an initial implementation, not yet the full research-grade camera system described in the product brief. Calibrated gaze estimation and MediaPipe face/hand landmark tracking are not integrated yet; camera-based game scoring is currently click/mouse-driven and clearly labelled.
+
+## Features
+- Responsive pastel UI with Big Bro AI mascot, homepage, game selection, methodology and privacy pages.
+- Reaction Rush uses `performance.now()` and randomized wait intervals.
+- Memory Matrix, Focus Flow, click-based visual search and mouse-based Motion Sync use actual user input.
+- Camera access is opt-in, shows a live preview only, and is stopped when leaving a game or unmounting.
+- Local Mind Awakening Report with JSON/CSV export and print layout.
+- FastAPI endpoints validate minimized summaries; the API deliberately does not persist them.
+- Scientific limitations and camera status are explicit.
+
+## Requirements
+- Node.js 20+ and npm
+- Python 3.11+
+- Modern browser. Camera preview requires permission and a secure context (localhost is normally acceptable for development; use HTTPS in production).
+
+## Start frontend (Windows PowerShell)
+```powershell
+cd mindverse-ai\frontend
+npm install
+npm run dev
+```
+Open the local URL printed by Vite, usually `http://localhost:5173`.
+
+## Start backend (Windows PowerShell, separate terminal)
+```powershell
+cd mindverse-ai\backend
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+API docs: `http://127.0.0.1:8000/docs`.
+
+## Start backend (macOS/Linux)
+```bash
+cd mindverse-ai/backend
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+## Tests
+```bash
+# Frontend
+cd frontend
+npm install
+npm test
+npm run build
+
+# Backend
+cd backend
+python -m pip install -r requirements.txt
+pytest -q
+```
+
+The frontend uses Vite, React, TypeScript, React Router, Framer Motion, Lucide React, and Recharts dependencies. The current report uses actual collected session data; Recharts is included for the next report-chart phase but charts are not yet implemented.
+
+## Architecture
+- `frontend/src/App.tsx`: application shell, navigation, game UI, local session state, camera preview lifecycle and exports.
+- `frontend/src/services/scoring.ts`: pure scoring helpers.
+- `backend/app/main.py`: API configuration, schemas, validation endpoints and non-persistent summary handling.
+- `docs/`: camera, science, architecture, privacy and testing notes.
+
+## Privacy
+The current build does not upload camera frames or persist session results. Camera preview is requested only after user action. Results remain in page memory unless the user explicitly downloads a JSON or CSV summary. API summary submission validates input but does not store it. This privacy statement applies to this source build; deployments should review code, hosting logs and any added analytics before making public promises.
+
+## Scientific limitations
+- Game scores are unvalidated session-specific metrics, not intelligence or alertness scores.
+- Reaction time is affected by display/input latency, browser scheduling and anticipation.
+- Face landmarks are not equivalent to eye gaze. The calibrated gaze-estimation system is not implemented in this version.
+- Motion Sync uses mouse clicks for scoring; the camera is only a preview and does not drive collisions in this version.
+- No game result diagnoses ADHD, fatigue, mental-health conditions, motor disorders or any medical condition.
+
+## Deployment and troubleshooting
+- Serve camera-enabled deployments over HTTPS.
+- If camera permission is denied or no camera is present, use click/mouse mode.
+- If the backend is unavailable, the frontend games and report continue to work locally.
+- Restrict `CORS_ORIGINS` to the deployed frontend origins.
+- Do not add raw camera data, face embeddings, or landmark histories to API requests.
+
+## Screenshots
+Add screenshots here after running the app locally.
